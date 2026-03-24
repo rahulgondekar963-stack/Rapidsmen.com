@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RapidsMen | Premium Relocation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+
+        :root {
+            --primary-black: #000000;
+            --soft-grey: #F5F5F7;
+            --border-grey: #E5E5E5;
+            --accent-green: #22C55E;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--soft-grey);
+            color: var(--primary-black);
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.02em;
+        }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid var(--border-grey);
+            border-radius: 0px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        }
+
+        h1 { letter-spacing: 0.2em; font-weight: 800; }
+        
+        .step-fade {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        input, select, textarea {
+            border: none !important;
+            border-bottom: 1.5px solid var(--border-grey) !important;
+            background: transparent !important;
+            border-radius: 0 !important;
+            padding: 1rem 0 !important;
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none !important;
+            border-bottom-color: var(--primary-black) !important;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-black);
+            color: white;
+            padding: 1.25rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-size: 0.75rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover { opacity: 0.8; }
+
+        .btn-whatsapp {
+            background-color: var(--accent-green);
+        }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="p-6 md:p-12 flex flex-col items-center min-h-screen">
+
+    <header class="mb-12 text-center">
+        <h1 class="text-2xl md:text-3xl uppercase">RapidsMen</h1>
+        <p class="text-[10px] tracking-[0.3em] text-gray-400 uppercase mt-2">Relocation Reimagined</p>
+    </header>
+
+    <main id="app" class="w-full max-w-lg card p-8 md:p-12">
+        
+        <div id="step1" class="step-fade">
+            <h2 class="text-xl mb-4 font-semibold">Ready for a seamless move?</h2>
+            <p class="text-gray-500 text-sm mb-10">Get an instant, transparent estimate in under 60 seconds.</p>
+            <button onclick="showStep(2)" class="btn-primary">Start Estimate</button>
+        </div>
+
+        <div id="step2" class="step-fade hidden">
+            <h2 class="text-lg mb-8 uppercase tracking-widest">Contact Details</h2>
+            <input type="text" id="userName" placeholder="Your Name">
+            <input type="tel" id="userPhone" placeholder="WhatsApp Number">
+            <button onclick="validateStep2()" class="btn-primary">Continue</button>
+        </div>
+
+        <div id="step3" class="step-fade hidden">
+            <h2 class="text-lg mb-8 uppercase tracking-widest">Move Scope</h2>
+            <select id="bhk">
+                <option value="" disabled selected>Select BHK Size</option>
+                <option value="0">1 RK</option>
+                <option value="1">1 BHK</option>
+                <option value="2">2 BHK</option>
+                <option value="3">3 BHK</option>
+            </select>
+            <textarea id="items" rows="3" placeholder="List major items (e.g. Bed, AC, 5 Boxes)"></textarea>
+            <button onclick="calculate()" class="btn-primary text-white">Generate Quote</button>
+        </div>
+
+        <div id="step4" class="step-fade hidden text-center">
+            <p class="text-[10px] uppercase tracking-widest text-gray-400 mb-2">Your Estimate</p>
+            <div id="priceDisplay" class="text-6xl font-bold mb-4">₹0</div>
+            <p id="workerDisplay" class="text-xs text-gray-400 mb-12 italic"></p>
+            <button onclick="sendToWhatsApp()" class="btn-primary btn-whatsapp text-white">Confirm Booking via WhatsApp</button>
+        </div>
+
+    </main>
+
+    <script>
+        let userData = {};
+
+        function showStep(stepNum) {
+            document.querySelectorAll('#app > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(`step${stepNum}`).classList.remove('hidden');
+        }
+
+        function validateStep2() {
+            const name = document.getElementById('userName').value;
+            const phone = document.getElementById('userPhone').value;
+            if(name && phone.length >= 10) {
+                userData.name = name;
+                userData.phone = phone;
+                showStep(3);
+            } else {
+                alert("Please enter a valid name and phone number.");
+            }
+        }
+
+        function calculate() {
+            const bhkValue = parseInt(document.getElementById('bhk').value);
+            const items = document.getElementById('items').value;
+            
+            // LOGIC: 1 worker per BHK + 2 extra, MIN 3 workers. ₹1600 per worker.
+            const workers = Math.max(3, bhkValue + 2);
+            const total = workers * 1600;
+
+            userData.bhk = document.getElementById('bhk').options[document.getElementById('bhk').selectedIndex].text;
+            userData.items = items;
+            userData.total = total;
+            userData.workers = workers;
+
+            document.getElementById('priceDisplay').innerText = `₹${total}`;
+            document.getElementById('workerDisplay').innerText = `Optimized for ${workers} Professional Handlers`;
+            showStep(4);
+        }
+
+        function sendToWhatsApp() {
+            const adminNumber = "9112433055";
+            const message = `*RAPIDSMEN BOOKING*%0A%0A👤 *Name:* ${userData.name}%0A📞 *Phone:* ${userData.phone}%0A🏠 *Type:* ${userData.bhk}%0A📦 *Items:* ${userData.items}%0A💰 *Estimate:* ₹${userData.total}%0A👷 *Crew:* ${userData.workers} Men`;
+            window.open(`https://wa.me/${adminNumber}?text=${message}`, '_blank');
+        }
+    </script>
+</body>
+</html>
